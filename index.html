@@ -290,31 +290,6 @@
   }
 
   // =====================================================
-  // AD NETWORK SETUP — IN-APP INTERSTITIAL
-  // =====================================================
-  function initInAppAds() {
-    if (typeof show_12119813 === 'function') {
-      try {
-        show_12119813({
-          type: 'inApp',
-          inAppSettings: {
-            frequency: 2,
-            capping: 0.1,
-            interval: 30,
-            timeout: 5,
-            everyPage: false
-          }
-        });
-      } catch (err) {
-        console.error('In-App ads initialization error:', err);
-      }
-    } else {
-      setTimeout(initInAppAds, 500);
-    }
-  }
-  initInAppAds();
-
-  // =====================================================
   // AD FUNCTION — REWARDED / INTERSTITIAL CALL
   // =====================================================
   // AD_FUNCTION_START
