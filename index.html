@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Telegram Mini Self Earning App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- =====================================================
+     AD NETWORK SDK — REPLACE THIS BLOCK FOR A NEW NETWORK/ACCOUNT
+     Ctrl+F "AD_SDK_START" diye eikhane esho, notun network er
+     <script> tag ta shudhu ei block er moddhe bosiye dio.
+===================================================== -->
+<!-- AD_SDK_START -->
+<script src='//libtl.com/sdk.js' data-zone='12119813' data-sdk='show_12119813'></script>
+<!-- AD_SDK_END -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 420px;
+    padding: 24px 20px;
+  }
+
+  /* top user bar */
+  .userbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f7f8fa;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+  }
+  .userbar-left { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #ff9f1a;
+    color: #fff;
+    display: flex; align-items: center justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .username { font-weight: 600; font-size: 15px; color: #222; }
+  .pts-badge {
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: #eafff2;
+  }
+
+  h1 {
+    text-align: center;
+    color: #1877f2;
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .stats {
+    display: flex;
+    background: #f7f8fa;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 16px 0;
+    margin-bottom: 20px;
+  }
+  .stat { flex: 1; text-align: center; }
+  .stat + .stat { border-left: 1px solid #e2e2e2; }
+  .stat .num { color: #2ecc71; font-size: 26px; font-weight: 700; }
+  .stat .label { color: #888; font-size: 13px; margin-top: 4px; }
+
+  button.action {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  button.action:active { opacity: .8; }
+  .btn-blue   { background: #1e83fb; }
+  .btn-green  { background: #27ae60; }
+  .btn-red    { background: #d63447; }
+
+  /* modal */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 22px;
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+  }
+  .modal h2 {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 18px;
+    color: #222;
+  }
+  .modal .close-x {
+    position: absolute;
+    top: 14px; right: 18px;
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  .modal select, .modal input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    margin-bottom: 14px;
+    background: #fafafa;
+    color: #333;
+  }
+  .modal .hint {
+    font-size: 12px;
+    color: #999;
+    margin: -8px 0 14px 2px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+    z-index: 200;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Telegram user bar -->
+  <div class="userbar">
+    <div class="userbar-left">
+      <div class="avatar" id="avatarLetter">?</div>
+      <div class="username" id="username">Guest</div>
+    </div>
+    <div class="pts-badge"><span id="ptsBadge">0</span> Pts</div>
+  </div>
+
+  <h1>Telegram Mini Self Earning App</h1>
+  <div class="subtitle">Developed by Mahi</div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="num" id="completedAds">0</div>
+      <div class="label">Completed Ads</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="totalPoints">0</div>
+      <div class="label">Total Points</div>
+    </div>
+  </div>
+
+  <button class="action btn-blue" id="btnInterstitial">Reward Interstitial</button>
+  <button class="action btn-blue" id="btnPopup">Reward Popup</button>
+  <button class="action btn-blue" id="btnInApp">In-App Interstitial</button>
+  <button class="action btn-green" id="btnWithdraw">Withdraw</button>
+  <button class="action btn-red" id="btnReset">Reset Count</button>
+
+</div>
+
+<!-- Withdraw Modal -->
+<div class="overlay" id="withdrawOverlay">
+  <div class="modal">
+    <button class="close-x" id="closeModal">&times;</button>
+    <h2>Withdraw Points</h2>
+    <select id="paymentMethod">
+      <option value="">Select Payment Method</option>
+      <option value="bKash">bKash</option>
+      <option value="Nagad">Nagad</option>
+      <option value="Rocket">Rocket</option>
+      <option value="Binance">Binance</option>
+    </select>
+    <input type="text" id="accountNumber" placeholder="Enter Account Number">
+    <input type="number" id="withdrawPoints" placeholder="Enter Points to Withdraw" min="1">
+    <div class="hint">Minimum withdraw: 1 point</div>
+    <button class="action btn-green" id="sendWithdraw" style="margin-bottom:0;">Send Withdraw Request</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------- Telegram user info ----------
+  let tg = window.Telegram ? window.Telegram.WebApp : null;
+  if (tg) {
+    tg.ready();
+    tg.expand();
+  }
+
+  function getTelegramUser() {
+    try {
+      const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (user) {
+        const name = user.username ? '@' + user.username : (user.first_name || 'User');
+        return { name, letter: (user.first_name || user.username || 'U').charAt(0).toUpperCase() };
+      }
+    } catch (e) {}
+    return { name: 'Guest', letter: 'G' };
+  }
+
+  const tgUser = getTelegramUser();
+  document.getElementById('username').textContent = tgUser.name;
+  document.getElementById('avatarLetter').textContent = tgUser.letter;
+
+  // ---------- State (persisted in localStorage) ----------
+  const state = {
+    completedAds: parseInt(localStorage.getItem('completedAds') || '0', 10),
+    totalPoints: parseInt(localStorage.getItem('totalPoints') || '0', 10)
+  };
+
+  function render() {
+    document.getElementById('completedAds').textContent = state.completedAds;
+    document.getElementById('totalPoints').textContent = state.totalPoints;
+    document.getElementById('ptsBadge').textContent = state.totalPoints;
+  }
+  render();
+
+  function saveState() {
+    localStorage.setItem('completedAds', state.completedAds);
+    localStorage.setItem('totalPoints', state.totalPoints);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ---------- Ad reward handler ----------
+  function awardPoint(source) {
+    state.completedAds += 1;
+    state.totalPoints += 1;
+    saveState();
+    render();
+    showToast('+1 Point earned (' + source + ')');
+  }
+
+  // =====================================================
+  // AD NETWORK SETUP — IN-APP INTERSTITIAL
+  // =====================================================
+  function initInAppAds() {
+    if (typeof show_12119813 === 'function') {
+      try {
+        show_12119813({
+          type: 'inApp',
+          inAppSettings: {
+            frequency: 2,
+            capping: 0.1,
+            interval: 30,
+            timeout: 5,
+            everyPage: false
+          }
+        });
+      } catch (err) {
+        console.error('In-App ads initialization error:', err);
+      }
+    } else {
+      setTimeout(initInAppAds, 500);
+    }
+  }
+  initInAppAds();
+
+  // =====================================================
+  // AD FUNCTION — REWARDED / INTERSTITIAL CALL
+  // =====================================================
+  // AD_FUNCTION_START
+  function showRewardedAd(source, btn) {
+    if (btn) { btn.disabled = true; }
+    try {
+      if (typeof show_12119813 === 'function') {
+        const adPromise = show_12119813();
+        if (adPromise && typeof adPromise.then === 'function') {
+          adPromise.then(() => {
+            // User ad dekha shesh korle eikhane point award hoy
+            awardPoint(source);
+            if (btn) { btn.disabled = false; }
+          }).catch(() => {
+            showToast('Ad load hoyni, abar try koro');
+            if (btn) { btn.disabled = false; }
+          });
+        } else {
+          awardPoint(source);
+          if (btn) { btn.disabled = false; }
+        }
+      } else {
+        showToast('Ad SDK load hoyni, page reload diye abar try koro');
+        if (btn) { btn.disabled = false; }
+      }
+    } catch (e) {
+      showToast('Ad SDK load hoyni, page reload diye abar try koro');
+      if (btn) { btn.disabled = false; }
+    }
+  }
+  // AD_FUNCTION_END
+
+  document.getElementById('btnInterstitial').addEventListener('click', (e) => {
+    showRewardedAd('Reward Interstitial', e.currentTarget);
+  });
+
+  document.getElementById('btnPopup').addEventListener('click', (e) => {
+    showRewardedAd('Reward Popup', e.currentTarget);
+  });
+
+  document.getElementById('btnInApp').addEventListener('click', (e) => {
+    showRewardedAd('In-App Interstitial', e.currentTarget);
+  });
+
+  // ---------- Withdraw modal ----------
+  const overlay = document.getElementById('withdrawOverlay');
+  document.getElementById('btnWithdraw').addEventListener('click', () => {
+    overlay.classList.add('show');
+  });
+  document.getElementById('closeModal').addEventListener('click', () => {
+    overlay.classList.remove('show');
+  });
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+
+  document.getElementById('sendWithdraw').addEventListener('click', () => {
+    const method = document.getElementById('paymentMethod').value;
+    const account = document.getElementById('accountNumber').value.trim();
+    const points = parseInt(document.getElementById('withdrawPoints').value, 10);
+
+    if (!method) { showToast('Payment method select করো'); return; }
+    if (!account) { showToast('Account number দাও'); return; }
+    if (!points || points < 1) { showToast('Minimum 1 point withdraw করা যাবে'); return; }
+    if (points > state.totalPoints) { showToast('তোমার এত point নাই'); return; }
+
+    // ---- এখানে backend এ (Telegram Bot API / Google Sheet / DB) request পাঠানোর কোড বসাবা ----
+    // demo হিসেবে আপাতত shown points থেকে বাদ দিয়ে দিচ্ছি:
+    state.totalPoints -= points;
+    saveState();
+    render();
+
+    showToast('Withdraw request পাঠানো হয়েছে ✅');
+    document.getElementById('paymentMethod').value = '';
+    document.getElementById('accountNumber').value = '';
+    document.getElementById('withdrawPoints').value = '';
+    overlay.classList.remove('show');
+  });
+
+  // ---------- Reset count (no confirm popup, auto reset) ----------
+  document.getElementById('btnReset').addEventListener('click', () => {
+    state.completedAds = 0;
+    state.totalPoints = 0;
+    saveState();
+    render();
+    showToast('Reset হয়ে গেছে ✅');
+  });
+</script>
+
+</body>
+</html>
